@@ -1,0 +1,7 @@
+﻿services:
+  documentintelligence.api:
+    image: documentintelligence.api
+    build:
+      context: .
+      dockerfile: DocumentIntelligence.API/Dockerfile
+
