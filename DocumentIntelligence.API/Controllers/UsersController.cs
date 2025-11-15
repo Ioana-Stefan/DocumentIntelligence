@@ -21,7 +21,7 @@ namespace DocumentIntelligence.WebApi.Controllers
             try
             {
                 var user = await _registrationService.RegisterUserAsync(dto);
-                return CreatedAtAction(nameof(Register), user); // 201 Created
+                return CreatedAtAction(nameof(Register), user);
             }
             catch (InvalidOperationException ex)
             {

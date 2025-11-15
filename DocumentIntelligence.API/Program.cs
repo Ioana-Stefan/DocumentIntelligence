@@ -1,76 +1,14 @@
-using System.Text;
-using DocumentIntelligence.Application.Repositories;
-using DocumentIntelligence.Application.Services.Auth.Interfaces;
-using DocumentIntelligence.Application.Services.Users;
-using DocumentIntelligence.Application.Services.Users.Interfaces;
-using DocumentIntelligence.Infrastructure.Persistence;
-using DocumentIntelligence.Infrastructure.Repositories;
-using DocumentIntelligence.Infrastructure.Services.Auth;
-using DocumentIntelligence.Infrastructure.Services.Users;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using DocumentIntelligence.Application.DependencyInjection;
+using DocumentIntelligence.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Identity context
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-// Your main app DbContext
-builder.Services.AddDbContext<DocumentIntelligenceDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-
-// Add Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
-
-// Add custom services
-builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-
-// Add repositories and Application services
-// Example (replace with your actual DI for services)
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-builder.Services.AddScoped<IUserRegistrationService, UserRegistrationService>();
-builder.Services.AddScoped<IUserAuthService,UserAuthService>();
-builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication(builder.Configuration);
 
 // Add controllers
 builder.Services.AddControllers();
 
-// Configure JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Secret"]))
-    };
-});
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();

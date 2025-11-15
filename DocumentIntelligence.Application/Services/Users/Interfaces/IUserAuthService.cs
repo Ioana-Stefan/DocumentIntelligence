@@ -1,9 +1,8 @@
 using DocumentIntelligence.Application.DTOs.Users;
 
-namespace DocumentIntelligence.Application.Services.Users.Interfaces
+public interface IUserAuthService
 {
-    public interface IUserAuthService
-    {
-        Task<AuthResponseDto> LoginAsync(LoginUserDto dto);
-    }
+    Task<UserResponseDto> LoginAsync(string email, string password);
+    Task<UserResponseDto> RefreshTokenAsync(string refreshToken);
+    Task RevokeRefreshTokenAsync(string refreshToken);
 }

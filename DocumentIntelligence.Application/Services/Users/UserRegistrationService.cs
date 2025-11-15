@@ -1,11 +1,8 @@
 using DocumentIntelligence.Application.DTOs.Users;
 using DocumentIntelligence.Application.Repositories;
-using DocumentIntelligence.Application.Services.Auth.Interfaces;
 using DocumentIntelligence.Application.Services.Users.Interfaces;
 using DocumentIntelligence.Domain.Entities;
-using DocumentIntelligence.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace DocumentIntelligence.Infrastructure.Services.Users
 {
@@ -13,35 +10,26 @@ namespace DocumentIntelligence.Infrastructure.Services.Users
     {
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
-        private readonly IJwtTokenService _jwtTokenService;
-        private readonly IRefreshTokenService _refreshTokenService;
-        private readonly DocumentIntelligenceDbContext _db;
+        private readonly IUserDomainRepository _userDomainRepository;
 
         public UserRegistrationService(
             IUserRepository userRepository,
             IRoleRepository roleRepository,
-            IJwtTokenService jwtTokenService,
-            IRefreshTokenService refreshTokenService,
-            DocumentIntelligenceDbContext db)
+            IUserDomainRepository userDomainRepository)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
-            _jwtTokenService = jwtTokenService;
-            _refreshTokenService = refreshTokenService;
-            _db = db;
+            _userDomainRepository = userDomainRepository;
         }
 
         public async Task<UserResponseDto> RegisterUserAsync(RegisterUserDto dto, string role = "User")
         {
-            // Check if email exists in Identity
             var existingIdentityUser = await _userRepository.GetByEmailAsync(dto.Email);
             if (existingIdentityUser != null)
                 throw new InvalidOperationException("Email already registered.");
 
-            // Generate a GUID for your domain user
             var domainUserId = Guid.NewGuid();
 
-            // Create IdentityUser, use GUID as string
             var identityUser = new IdentityUser
             {
                 Id = domainUserId.ToString(),
@@ -56,7 +44,6 @@ namespace DocumentIntelligence.Infrastructure.Services.Users
                 throw new InvalidOperationException($"User creation failed: {errors}");
             }
 
-            // Create domain user entry
             var domainUser = new User
             {
                 Id = domainUserId,
@@ -64,10 +51,9 @@ namespace DocumentIntelligence.Infrastructure.Services.Users
                 Name = dto.Name
             };
 
-            _db.Users.Add(domainUser);
-            await _db.SaveChangesAsync();
 
-            // Roles
+            await _userDomainRepository.AddAsync(domainUser);
+
             if (!await _roleRepository.RoleExistsAsync(role))
             {
                 var roleResult = await _roleRepository.CreateRoleAsync(role);
