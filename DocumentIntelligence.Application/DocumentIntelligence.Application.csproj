@@ -10,4 +10,8 @@
       <ProjectReference Include="..\DocumentIntelligence.Domain\DocumentIntelligence.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.*" />
+    </ItemGroup>
+
 </Project>
