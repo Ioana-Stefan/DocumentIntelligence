@@ -4,6 +4,9 @@ namespace DocumentIntelligence.Application.DTOs.Users
     {
         public string Id { get; set; } = null!;
         public string Email { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public string[] Roles { get; set; } = Array.Empty<string>();
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }

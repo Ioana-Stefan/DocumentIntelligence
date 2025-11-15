@@ -1,8 +1,10 @@
 using System.Text;
 using DocumentIntelligence.Application.Repositories;
 using DocumentIntelligence.Application.Services.Auth.Interfaces;
+using DocumentIntelligence.Application.Services.Users;
 using DocumentIntelligence.Application.Services.Users.Interfaces;
 using DocumentIntelligence.Infrastructure.Persistence;
+using DocumentIntelligence.Infrastructure.Repositories;
 using DocumentIntelligence.Infrastructure.Services.Auth;
 using DocumentIntelligence.Infrastructure.Services.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,12 +14,15 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add PostgreSQL DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+// Identity context
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Your main app DbContext
 builder.Services.AddDbContext<DocumentIntelligenceDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AppDb")));
+    options.UseNpgsql(connectionString));
 
 
 // Add Identity
@@ -40,6 +45,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRegistrationService, UserRegistrationService>();
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 // Add controllers
 builder.Services.AddControllers();

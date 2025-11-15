@@ -1,4 +1,5 @@
 using DocumentIntelligence.Domain.Entities;
+using DocumentIntelligence.Infrastructure.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace DocumentIntelligence.Infrastructure.Persistence
@@ -16,6 +17,7 @@ namespace DocumentIntelligence.Infrastructure.Persistence
         public DbSet<DocumentPage> DocumentPages { get; set; } = null!;
         public DbSet<Annotation> Annotations { get; set; } = null!;
         public DbSet<ProcessingJob> ProcessingJobs { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,8 +29,7 @@ namespace DocumentIntelligence.Infrastructure.Persistence
                 entity.ToTable("users");
                 entity.HasKey(u => u.Id);
                 entity.Property(u => u.Email).IsRequired().HasMaxLength(255);
-                entity.Property(u => u.PasswordHash).IsRequired();
-                entity.Property(u => u.Role).HasConversion<string>().IsRequired();
+                entity.Property(u => u.Name).IsRequired().HasMaxLength(255);
                 entity.Property(u => u.CreatedAt).IsRequired();
             });
 
