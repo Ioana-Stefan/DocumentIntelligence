@@ -41,5 +41,46 @@ namespace DocumentIntelligence.Infrastructure.Services.Auth
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public (bool IsValid, string? UserId, string? Email, IEnumerable<string> Roles) ValidateToken(string token)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var validationParams = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings["Issuer"],
+
+                ValidateAudience = true,
+                ValidAudience = jwtSettings["Audience"],
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(30),
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParams, out _);
+
+                var userId = principal.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var email  = principal.FindFirstValue(JwtRegisteredClaimNames.Email);
+                var roles  = principal.Claims
+                    .Where(c => c.Type == ClaimTypes.Role)
+                    .Select(c => c.Value)
+                    .ToArray();
+
+                return (true, userId, email, roles);
+            }
+            catch
+            {
+                return (false, null, null, Array.Empty<string>());
+            }
+        }
     }
 }

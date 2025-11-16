@@ -39,7 +39,7 @@ export class LoginComponent {
 
     const { email, password } = this.loginForm.value;
 
-    this.authService.login({ email, password }).subscribe({
+    this.authService.login( email, password ).subscribe({
       next: (response) => {
         // Optionally store tokens in localStorage/sessionStorage
         localStorage.setItem('accessToken', response.accessToken);

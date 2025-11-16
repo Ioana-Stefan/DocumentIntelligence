@@ -70,4 +70,11 @@ public class UserAuthService : IUserAuthService
     {
         return _refreshTokenService.RevokeRefreshTokenAsync(refreshToken);
     }
+
+    public bool IsTokenValid(string token)
+    {
+        var result = _tokenService.ValidateToken(token);
+        return result.IsValid;
+    }
+
 }

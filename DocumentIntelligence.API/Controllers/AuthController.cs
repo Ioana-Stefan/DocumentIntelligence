@@ -48,5 +48,19 @@ namespace DocumentIntelligence.WebApi.Controllers
             await _authService.RevokeRefreshTokenAsync(dto.Token);
             return NoContent();
         }
+
+        [HttpPost("validate")]
+        public IActionResult ValidateToken([FromBody] RefreshTokenRequestDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Token))
+                return BadRequest(new { error = "Token is required." });
+
+            var isValid = _authService.IsTokenValid(dto.Token);
+
+            if (!isValid)
+                return Unauthorized(new { valid = false, error = "Invalid or expired token." });
+
+            return Ok(new { valid = true });
+        }
     }
 }
