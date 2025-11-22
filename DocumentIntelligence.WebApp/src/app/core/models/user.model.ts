@@ -6,3 +6,9 @@ export interface UserResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface UserRegistrationResponse {
+  id: string;
+  email: string;
+  name: string;
+}

@@ -1,0 +1,43 @@
+<div class="register-container mat-app-background">
+    <h2>Register</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+
+        <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput type="text" formControlName="name" />
+        <mat-error *ngIf="registerForm.get('name')?.hasError('required')">
+            Name is required
+        </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+        <mat-error *ngIf="registerForm.get('email')?.hasError('required')">
+            Email is required
+        </mat-error>
+        <mat-error *ngIf="registerForm.get('email')?.hasError('email')">
+            Enter a valid email
+        </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" />
+        <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+            Password is required
+        </mat-error>
+        <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+            Minimum 6 characters
+        </mat-error>
+        </mat-form-field>
+
+        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+        {{ loading ? 'Registering...' : 'Register' }}
+        </button>
+
+    </form>
+</div>

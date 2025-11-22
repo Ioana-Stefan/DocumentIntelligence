@@ -1,4 +1,4 @@
-.login-container {
+.register-container {
   width: 350px;
   margin: 50px auto;
   padding: 30px;
@@ -17,15 +17,4 @@
   margin-bottom: 10px;
 }
 
-.register-link {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.register-link a {
-  margin-left: 4px;
-  cursor: pointer;
-  color: #3f51b5;
-  text-decoration: underline;
-}
 
